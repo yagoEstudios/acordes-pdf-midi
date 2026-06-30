@@ -216,4 +216,9 @@ input[type="text"]::placeholder, textarea::placeholder { color: var(--placeholde
   .grid { grid-template-columns: 1fr; }
   /* el nombre del archivo ocupa su propia línea completa */
   .file-name { flex-basis: 100%; order: 3; }
+  /* en móvil el footer va en flujo normal (fijo tapaba el contenido al scrollear) */
+  .links-footer {
+    position: static;
+    margin-top: clamp(1.5rem, 6vw, 2.5rem);
+  }
 }

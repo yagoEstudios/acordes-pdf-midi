@@ -1,32 +1,39 @@
-# iReal / MusicXML / TXT → PDF + MIDI
+# Acordes (Real / MusicXML / TXT) → PDF + MIDI
 
-Convierte progresiones de acordes en **lead sheet PDF** (estilo iReal Pro) y en **MIDI** (con voice leading).
+Convierte progresiones de acordes en **lead sheet PDF** (estilo Real Pro) y en **MIDI** (con voice leading).
 
-Acepta 3 fuentes; todas se normalizan a un `.txt` propio y de ahí se generan los archivos.
+**▶ Web: https://yagoestudios.github.io/acordes-pdf-midi/**
 
-## Uso
+Acepta varias fuentes (un enlace Real, un archivo `.musicxml`/`.xml`, o un `.txt` propio); todas se normalizan a un `.txt` y de ahí se generan los archivos.
+
+## Uso (web)
+
+1. Abre la web.
+2. **Pega un enlace**, **sube** un archivo `.musicxml`/`.txt`, o **pega directamente el texto** de un `.txt`.
+3. (Opcional) rellena *Transponer a* y *BPM*.
+4. Elige la salida:
+   - **Completo** → un `.zip` con el `.txt`, la fuente, el `.pdf` y el `.mid`.
+   - **Solo PDF** / **Solo MIDI** → descarga ese archivo suelto.
+5. **Generar** → se descarga.
+
+Cómo escribir el `.txt` que puedes pegar/subir: ver más abajo.
+
+---
+
+## Uso local (opcional)
+
+Hay una app de escritorio con la misma lógica y una interfaz gráfica, en `local.py`:
 
 ```bash
-# GUI
-python ireal_pdf.py
+pip install reportlab pychord midiutil pyRealParser customtkinter
 
-# CLI: archivo .txt, .musicxml/.xml, o enlace iReal
-python ireal_pdf.py micancion.txt
-python ireal_pdf.py Fujita.musicxml
-python ireal_pdf.py "irealb://..."
+python local.py                  # interfaz gráfica
+python local.py micancion.txt    # CLI: .txt
+python local.py Fujita.musicxml  # CLI: .musicxml / .xml
+python local.py "<enlace>"       # CLI: enlace
 ```
 
-Por cada canción se crea una carpeta en `salida/<Cancion>/` con:
-
-```
-salida/Fujita/
-├─ Fujita.txt        # .txt canónico (generado siempre)
-├─ Fujita.musicxml   # la fuente original (.musicxml / .ireal; en txt es el propio .txt)
-├─ Fujita.pdf
-└─ Fujita.mid
-```
-
-Dependencias: `pip install -r requirements.txt`
+Crea una carpeta `salida/<Cancion>/` con el `.txt`, la fuente original, el `.pdf` y el `.mid`.
 
 ---
 
@@ -195,6 +202,6 @@ Se escriben en notación legible normal. Para el PDF se convierten a símbolos:
 | `F/G`     | `F/G` | con bajo (slash chord) |
 | `A#`, `Bb`| `A#`  | alteraciones           |
 
-La raíz va grande y el resto (extensión) en subíndice, como en iReal.
+La raíz va grande y el resto (extensión) en subíndice, como en Real.
 
 > El `.txt` canónico guarda siempre los nombres legibles (`Dm7b5`) para que el MIDI funcione (usa `pychord`); los símbolos `△ ° ø` son solo del PDF.
