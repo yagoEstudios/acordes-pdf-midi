@@ -141,7 +141,7 @@ Plain readable notation; the PDF converts it to symbols:
 | `Cmaj7` | `C△7` | major seventh |
 | `Dm7` | `Dm7` | minor seventh |
 | `Ddim7` | `D°7` | diminished |
-| `Dm7b5` | `Dø` | half-diminished |
+| `Dm7b5` | `Dø7` | half-diminished |
 | `G7` | `G7` | dominant |
 | `F/G` | `F/G` | slash chord |
 
