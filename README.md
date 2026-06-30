@@ -1,129 +1,79 @@
-# Acordes (Real / MusicXML / TXT) → PDF + MIDI
+# Acordes → PDF + MIDI
 
-Convierte progresiones de acordes en **lead sheet PDF** (estilo Real Pro) y en **MIDI** (con voice leading).
+Convierte una progresión de acordes en una **lead sheet PDF** (estilo Real Pro) y en un **MIDI** con voice leading.
 
 **▶ Web: https://yagoestudios.github.io/acordes-pdf-midi/**
 
-Acepta varias fuentes (un enlace Real, un archivo `.musicxml`/`.xml`, o un `.txt` propio); todas se normalizan a un `.txt` y de ahí se generan los archivos.
+Entrada: un enlace Real, un archivo `.musicxml`/`.xml`, o un `.txt` propio. Todo se normaliza a un `.txt` y de ahí salen el PDF y el MIDI.
+
+## Cómo queda
+
+Este `.txt`:
+
+```
+tune="Fujita"
+artist="Lewis"
+key=C
+sig=4/4
+bpm=200
+
+= x2
+Cmaj7 Bm7b5_E7 Am7 Gm7_C7
+Fmaj7 Em7b5_A7 Dm7 Fm_F/G
+```
+
+produce este PDF:
+
+![Ejemplo Fujita](ejemplo-fujita.png)
 
 ## Uso (web)
 
 1. Abre la web.
-2. **Pega un enlace**, **sube** un archivo `.musicxml`/`.txt`, o **pega directamente el texto** de un `.txt`.
-3. (Opcional) rellena *Transponer a* y *BPM*.
-4. Elige la salida:
-   - **Completo** → un `.zip` con el `.txt`, la fuente, el `.pdf` y el `.mid`.
-   - **Solo PDF** / **Solo MIDI** → descarga ese archivo suelto.
-5. **Generar** → se descarga.
-
-Cómo escribir el `.txt` que puedes pegar/subir: ver más abajo.
-
----
+2. Pega un enlace, sube un `.musicxml`/`.txt`, o pega el texto de un `.txt`.
+3. (Opcional) *Transponer a* y *BPM*.
+4. Salida: **Completo** (`.zip` con txt + fuente + pdf + mid) o **Solo PDF** / **Solo MIDI**.
+5. **Generar**.
 
 ## Uso local (opcional)
 
-Hay una app de escritorio con la misma lógica y una interfaz gráfica, en `local.py`:
+App de escritorio con la misma lógica (`local.py`):
 
 ```bash
 pip install reportlab pychord midiutil pyRealParser customtkinter
 
 python local.py                  # interfaz gráfica
-python local.py micancion.txt    # CLI: .txt
-python local.py Fujita.musicxml  # CLI: .musicxml / .xml
-python local.py "<enlace>"       # CLI: enlace
+python local.py micancion.txt    # CLI (.txt / .musicxml / enlace)
 ```
 
-Crea una carpeta `salida/<Cancion>/` con el `.txt`, la fuente original, el `.pdf` y el `.mid`.
+Crea `salida/<Cancion>/` con el `.txt`, la fuente, el `.pdf` y el `.mid`.
 
 ---
 
-## Cómo escribir un `.txt`
+# Formato del `.txt`
 
-### Argumentos principales (cabecera)
+## Cabecera
 
-Al **principio del archivo**, una línea por variable con la forma `clave=valor`.
-Las claves no distinguen mayúsculas. **Todos los valores van entre comillas
-`"..."` excepto `bpm`**, que es el único puramente numérico y va suelto. Todas
-las variables son opcionales; este es el conjunto completo (no hay más):
+Una línea por variable, `clave=valor`, al principio del archivo. Todas opcionales. **Valores entre comillas salvo `bpm`.** Luego una línea en blanco y los acordes.
 
-| Clave    | Tipo        | Por defecto | Qué hace                                            |
-|----------|-------------|-------------|-----------------------------------------------------|
-| `tune`   | texto       | `cancion`   | título; da nombre a la carpeta y a los archivos     |
-| `artist` | texto       | (vacío)     | compositor; aparece arriba a la derecha             |
-| `bpm`    | número      | `120`       | tempo del MIDI                                       |
-| `key`    | texto       | (vacío)     | tonalidad (`Eb`, `Gm`, `F#m`…); cabecera del PDF y origen para transponer |
-| `sig`    | `n/d`       | `4/4`       | compás; reparte los beats por compás en el MIDI     |
-| `transpose` / `trans` | tono, nº o `grados` | (vacío) | transpone (ver abajo) |
+| Clave | Por defecto | Qué hace |
+|-------|-------------|----------|
+| `tune` | `cancion` | título; nombra carpeta y archivos |
+| `artist` | (vacío) | compositor (arriba a la derecha) |
+| `bpm` | `120` | tempo del MIDI (sin comillas) |
+| `key` | (vacío) | tonalidad (`Eb`, `Gm`, `F#m`…); necesaria para transponer |
+| `sig` | `4/4` | compás; reparte los beats en el MIDI |
+| `trans` | (vacío) | transpone (ver abajo) |
 
-```
-tune="Mi Tema"
-artist="Yo"
-bpm=120
-key="Eb"
-sig="4/4"
-```
-
-(Solo `bpm` va sin comillas.)
-
-Tras la cabecera va una **línea en blanco** y luego los acordes.
-
-### Transponer (opcional)
-
-`transpose=` mueve todos los acordes (y la `key`) a otra tonalidad. **Solo
-funciona si `key` está definida** (hace falta saber el tono de origen); si no, se
-avisa y no se transpone. También hay un campo "Transponer a" en la interfaz.
-
-- **Tonalidad destino**: `trans=Gm`, `trans=Db`, `trans=C#`, `trans=Abmin`…
-- **Semitonos**: `trans=+3`, `trans=-2`.
-- **Grados** (números romanos / función): `trans=grados`. Cada acorde se muestra
-  como su grado relativo a la tonalidad: **mayúscula = mayor, minúscula = menor**
-  (con su `m`), `°`=disminuido, `ø7`=semidisminuido. Las alteraciones van delante
-  del numeral en la línea base (`♭VII`, `♯IV`); medido respecto a la escala mayor
-  de la tónica, así que en menor los III/VI/VII salen como `♭III`/`♭VI`/`♭VII`.
-  El MIDI sigue siendo el acorde real (los grados son solo para el PDF). Requiere
-  `key` definida.
-
-(`trans` y `transpose` son lo mismo.) Al transponer, el **PDF y el MIDI** salen con
-el tono entre paréntesis en el nombre: `Mi Tema (Gm).pdf` / `Mi Tema (Gm).mid`. En
-modo `grados` el PDF es `Mi Tema (grados).pdf` pero el **MIDI lleva el tono original**
-(`Mi Tema (Em).mid`), porque suena en el tono original.
-
-Desde la interfaz, lo que pongas en "Transponer a" y en "BPM" se guarda en el `.txt`
-(como `trans=` / `bpm=`, sobrescribiendo lo que trajera la fuente) y de ahí se
-generan el PDF y el MIDI. El campo **BPM** es opcional: vacío = el tempo de la fuente.
-
-La **calidad mayor/menor la manda el tema de origen** (transponer no convierte
-mayor en menor). Si escribes una tonalidad de la otra calidad, se usa su
-**relativa** (misma armadura): con un tema en Em, `transpose=C` y `transpose=Am`
-dan lo mismo (Am); `transpose=D` = `transpose=Bm`. Cada tono coge su grafía
-correcta (sostenidos o bemoles).
-
-### Acordes
+## Acordes
 
 - **Un acorde = un compás.** Separados por espacios.
-- **Cada línea = una fila** en el PDF.
-- **`_`** une varios acordes en el **mismo compás**, repartiendo los beats a partes
-  iguales: en 4/4, `Dm7_G7` = 2 beats cada uno; `Am_nan_Dm_G` = 1 beat cada uno.
-- **`nan`** (o `n`) es un hueco: en el **PDF** deja un espacio vacío y en el **MIDI**
-  el acorde anterior **sigue sonando** ese beat. Así `Am_nan_Dm_G` en 4/4 = Am 2 beats,
-  Dm 1, G 1. En 3/4, `Am_Dm_G` = 1 beat cada uno.
+- **Cada línea = una fila** del PDF.
+- **`_`** une acordes en el **mismo compás**, repartiendo beats: en 4/4, `Dm7_G7` = 2 beats cada uno.
+- **`nan`** (o `n`) es un hueco: en el PDF deja espacio vacío; en el MIDI el acorde anterior sigue sonando ese beat. `Am_nan_Dm_G` en 4/4 = Am 2, Dm 1, G 1.
 
-### Secciones (opcional)
+## Secciones y repetición
 
-Una línea que **empieza por `=`** marca el inicio de una sección. La etiqueta se dibuja sobre el primer compás de la fila siguiente.
-
-```
-= Estribillo
-C Am F G
-```
-
-Si no pones secciones, no aparece ninguna.
-
-### Repetir una sección N veces
-
-Añade **`xN`** al final de la línea de la sección. Esa sección se repite `N`
-veces tanto en el **PDF** (se dibuja N veces, cada una con su etiqueta) como en
-el **MIDI** (suena N veces). La sección llega hasta el siguiente `=` o el final.
+Una línea que **empieza por `=`** marca una sección (su etiqueta se dibuja sobre la fila siguiente). Añade **`xN`** para repetirla N veces (en PDF y MIDI):
 
 ```
 = A x2
@@ -133,79 +83,29 @@ C Am F G
 Dm7 G7 C C
 ```
 
-Aquí la sección **A** sale dos veces y la **B** una. Sin `xN` (o `x1`) no se repite.
+A sale dos veces, B una.
 
-> La repetición es de los `.txt`. Las fuentes MusicXML e iReal generan sus
-> propias secciones, pero sin este `xN`.
+## Transponer
 
----
+`trans=` mueve todos los acordes y la `key`. **Requiere `key` definida.** También hay campo "Transponer a" en la web.
 
-## Ejemplos
+- **Tonalidad destino**: `trans=Gm`, `trans=Db`, `trans=Abmin`…
+- **Semitonos**: `trans=+3`, `trans=-2`.
+- **Grados** (números romanos): `trans=grados` → mayúscula = mayor, minúscula = menor, `°` disminuido, `ø7` semidisminuido. El MIDI sigue sonando los acordes reales.
 
-### Mínimo
-
-```
-tune="Blues en C"
-bpm=120
-
-C7 F7 C7 C7
-F7 F7 C7 C7
-G7 F7 C7 G7
-```
-
-### Con varios acordes por compás (`_`) y compás 3/4
-
-En 3/4 el compás tiene 3 beats, así que para que el reparto salga limpio divide
-con `_` en **tres** acordes (1 beat cada uno). Dividir en dos daría 1,5 beats por
-acorde.
-
-```
-tune="Vals"
-artist="Juan"
-bpm=90
-key="G"
-sig="3/4"
-
-G Em C
-A7 D7 G_Em_A7
-```
-
-### Con secciones
-
-```
-tune="Mi Cancion"
-artist="Yo"
-bpm=140
-key="Am"
-
-= Intro
-Am F C G
-
-= Verso
-Am Am Dm Dm
-F F E7 E7
-
-= Estribillo
-C G Am F
-C G Dm_E7 Am
-```
-
----
+La calidad mayor/menor la manda el tema de origen; si pides la otra, se usa su relativa (misma armadura). El PDF/MIDI salen con el tono en el nombre: `Fujita (Gm).pdf`.
 
 ## Notación de acordes
 
-Se escriben en notación legible normal. Para el PDF se convierten a símbolos:
+Notación legible normal; el PDF los convierte a símbolos:
 
-| Escribes  | PDF   | Significado            |
-|-----------|-------|------------------------|
-| `Cmaj7`   | `C△7` | mayor séptima          |
-| `Dm7`     | `Dm7` | menor séptima          |
-| `Ddim7`   | `D°7` | disminuido             |
-| `Dm7b5`   | `Dø`  | semidisminuido         |
-| `G7`      | `G7`  | dominante              |
-| `F/G`     | `F/G` | con bajo (slash chord) |
-| `A#`, `Bb`| `A#`  | alteraciones           |
+| Escribes | PDF | |
+|----------|-----|--|
+| `Cmaj7` | `C△7` | mayor séptima |
+| `Dm7` | `Dm7` | menor séptima |
+| `Ddim7` | `D°7` | disminuido |
+| `Dm7b5` | `Dø` | semidisminuido |
+| `G7` | `G7` | dominante |
+| `F/G` | `F/G` | slash chord |
 
-La raíz va grande y el resto (extensión) en subíndice, como en Real.
-
-> El `.txt` canónico guarda siempre los nombres legibles (`Dm7b5`) para que el MIDI funcione (usa `pychord`); los símbolos `△ ° ø` son solo del PDF.
+El `.txt` guarda siempre los nombres legibles (`Dm7b5`) para que el MIDI funcione; los símbolos `△ ° ø` son solo del PDF.
