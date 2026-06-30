@@ -185,7 +185,11 @@ input[type="text"]::placeholder, textarea::placeholder { color: var(--placeholde
 .status.error { color: #CF6679; }
 
 .links-footer {
-  margin-top: clamp(1rem, 4vw, 1.5rem);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: clamp(0.6rem, 2vw, 1rem);
   text-align: center;
   font-size: clamp(0.8rem, 1.5vw, 0.95rem);
   color: var(--placeholder);
