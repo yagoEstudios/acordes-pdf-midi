@@ -1,0 +1,8 @@
+tune="Sections"
+key="C"
+
+= A x2
+C Am F G
+
+= B
+Dm7 G7 C C

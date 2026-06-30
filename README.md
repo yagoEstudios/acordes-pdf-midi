@@ -71,11 +71,24 @@ One line per variable, `key=value`, at the top of the file. All optional. **Valu
 - **`_`** joins chords in the **same bar**, splitting the beats: in 4/4, `Dm7_G7` = 2 beats each.
 - **`nan`** (or `n`) is a gap: in the PDF it leaves empty space; in the MIDI the previous chord keeps sounding that beat. `Am_nan_Dm_G` in 4/4 = Am 2, Dm 1, G 1.
 
+```
+tune="Bars"
+key="C"
+
+C Dm7_G7 C C
+Am_nan_Dm_G C C C
+```
+
+![Bars example](examples/bars.png)
+
 ## Sections and repeats
 
 A line that **starts with `=`** marks a section (its label is drawn above the next row). Add **`xN`** to repeat it N times (in PDF and MIDI):
 
 ```
+tune="Sections"
+key="C"
+
 = A x2
 C Am F G
 
@@ -84,6 +97,8 @@ Dm7 G7 C C
 ```
 
 A plays twice, B once.
+
+![Sections example](examples/sections.png)
 
 ## Transpose
 
@@ -94,6 +109,28 @@ A plays twice, B once.
 - **Degrees** (roman numerals): `trans=deg` → uppercase = major, lowercase = minor, `°` diminished, `ø7` half-diminished. The MIDI still plays the real chords.
 
 The major/minor quality is set by the source tune; if you ask for the other one, its relative (same key signature) is used. The PDF/MIDI come out with the key in the name: `Fujita (Gm).pdf`.
+
+```
+tune="Transpose"
+key="C"
+trans="Eb"
+
+Cmaj7 Am7 Dm7 G7
+```
+
+![Transpose example](examples/transpose.png)
+
+With `trans="deg"` the same chords become roman numerals (extensions kept):
+
+```
+tune="Degrees"
+key="C"
+trans="deg"
+
+Cmaj7 Am7 Dm7 G7
+```
+
+![Degrees example](examples/degrees.png)
 
 ## Chord notation
 
@@ -107,5 +144,14 @@ Plain readable notation; the PDF converts it to symbols:
 | `Dm7b5` | `Dø` | half-diminished |
 | `G7` | `G7` | dominant |
 | `F/G` | `F/G` | slash chord |
+
+```
+tune="Chord symbols"
+key="C"
+
+Cmaj7 Dm7 Ddim7 Dm7b5 G7 F/G
+```
+
+![Chord symbols example](examples/symbols.png)
 
 The `.txt` always stores the readable names (`Dm7b5`) so the MIDI works; the `△ ° ø` symbols are PDF-only.

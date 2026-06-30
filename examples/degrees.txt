@@ -1,0 +1,5 @@
+tune="Degrees"
+key="C"
+trans="deg"
+
+Cmaj7 Am7 Dm7 G7

@@ -1,0 +1,5 @@
+tune="Transpose"
+key="C"
+trans="Eb"
+
+Cmaj7 Am7 Dm7 G7

@@ -1,0 +1,5 @@
+tune="Bars"
+key="C"
+
+C Dm7_G7 C C
+Am_nan_Dm_G C C C

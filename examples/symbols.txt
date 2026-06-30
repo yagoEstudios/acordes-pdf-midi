@@ -1,0 +1,4 @@
+tune="Chord symbols"
+key="C"
+
+Cmaj7 Dm7 Ddim7 Dm7b5 G7 F/G
