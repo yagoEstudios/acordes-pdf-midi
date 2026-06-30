@@ -55,14 +55,14 @@ Creates `output/<Song>/` with the `.txt`, the source, the `.pdf` and the `.mid`.
 
 One line per variable, `key=value`, at the top of the file. All optional. **Values in quotes except `bpm`.** Then a blank line and the chords.
 
-| Key | Default | What it does |
-|-------|-------------|----------|
-| `tune` | `cancion` | title; names the folder and files |
-| `artist` | (optional) | composer (top right) |
-| `bpm` | `120` | MIDI tempo (no quotes) |
-| `key` | (optional) | key (`Eb`, `Gm`, `F#m`…); required to transpose |
-| `sig` | `4/4` | time signature; distributes the beats in the MIDI |
-| `trans` | (optional) | transpose (see below) |
+| Key | Example |
+|-------|-------------|
+| `tune` | `tune="My Song"` |
+| `artist` | `artist="Lewis"` (optional) |
+| `bpm` | `bpm=120` |
+| `key` | `key="C"` (optional) |
+| `sig` | `sig="4/4"` |
+| `trans` | `trans="Eb"` (optional) |
 
 ## Chords
 
