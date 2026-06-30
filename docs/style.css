@@ -184,6 +184,21 @@ input[type="text"]::placeholder, textarea::placeholder { color: var(--placeholde
 .status.ok { color: var(--secondary); }
 .status.error { color: #CF6679; }
 
+.links-footer {
+  margin-top: clamp(1rem, 4vw, 1.5rem);
+  text-align: center;
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+  color: var(--placeholder);
+}
+
+.links-footer a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.links-footer a:hover { text-decoration: underline; }
+.links-footer span { margin: 0 0.5em; }
+
 @media (max-width: 32rem) {
   body {
     align-items: flex-start;
