@@ -1116,7 +1116,7 @@ def parse_song_txt(path, transpose=""):
             span[-1]["times"] = b["repeat"]
         measures.extend(span)
     if not measures:
-        raise ValueError("El archivo no contiene acordes.")
+        raise ValueError("The file contains no chords.")
     if measures[0]["left"] == "|":
         measures[0]["left"] = "["
     if not any(m.get("end") for m in measures) and measures[-1]["right"] == "|":
@@ -1143,7 +1143,7 @@ def _out_name(tune, midi=False):
     name = safe_filename(tune.title or "cancion")
     key = getattr(tune, "key", "").replace("-", "m")
     if getattr(tune, "degrees", False):
-        name += f" ({key})" if (midi and key) else " (grados)"
+        name += f" ({key})" if (midi and key) else " (deg)"
     elif getattr(tune, "transposed", False):
         name += f" ({key})"
     return name
@@ -1176,7 +1176,7 @@ def note_to_midi(note_str):
         octave, s = int(s[-1]), s[:-1]
     semitone = LETTER_SEMITONE.get(s[0])
     if semitone is None:
-        raise ValueError(f"Nota no reconocida: {note_str!r}")
+        raise ValueError(f"Unrecognized note: {note_str!r}")
     for ch in s[1:]:
         semitone += 1 if ch == '#' else -1 if ch == 'b' else 0
     return semitone + (octave * 12) + 12
@@ -1268,7 +1268,7 @@ def convert_txt_to_midi(path, output_folder, volume=100, program=0,
                     midi.addNote(0, 0, note, time, duration, volume)
                 prev_name = name
             except Exception as e:
-                warnings.append(f"Acorde ignorado {name!r}: {e}")
+                warnings.append(f"Chord skipped {name!r}: {e}")
         time += duration
 
     os.makedirs(output_folder, exist_ok=True)
@@ -1437,7 +1437,7 @@ def load_tunes(src):
         return "musicxml", [parse_musicxml(src)]
     if ext == ".txt":
         return "txt", [parse_song_txt(src)]
-    raise ValueError(f"Fuente no reconocida: {src!r}")
+    raise ValueError(f"Unrecognized source: {src!r}")
 
 
 def process_source(src, dest_root, transpose="", bpm="", output="full"):
@@ -1447,7 +1447,7 @@ def process_source(src, dest_root, transpose="", bpm="", output="full"):
     Devuelve (carpetas, avisos)."""
     kind, tunes = load_tunes(src)
     if not tunes:
-        raise ValueError("No se ha leído ninguna canción de la fuente.")
+        raise ValueError("No song could be read from the source.")
     folders, warnings = [], []
     for tune in tunes:
         name = safe_filename(tune.title or "cancion")
@@ -1455,12 +1455,12 @@ def process_source(src, dest_root, transpose="", bpm="", output="full"):
         if bpm:
             tune.bpm = bpm   # override del tempo (afecta a ireal/musicxml via tune_to_txt)
         if transpose and not getattr(tune, "key", ""):
-            warnings.append(f"'{tune.title}': no se pudo transponer (la canción no tiene tonalidad).")
+            warnings.append(f"'{tune.title}': could not transpose (the song has no key).")
 
         if output == "full":
             folder = os.path.join(dest_root, name)
             if os.path.exists(folder):
-                raise FileExistsError(f"La carpeta ya existe: {folder}")
+                raise FileExistsError(f"The folder already exists: {folder}")
             os.makedirs(folder)
 
             # 1) .txt canónico (con trans=/bpm= si se pidieron)
@@ -1554,12 +1554,12 @@ def _zip_files(paths):
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for p in paths:
             z.write(p, os.path.basename(p))
-    return buf.getvalue(), "archivos.zip"
+    return buf.getvalue(), "files.zip"
 
 
 @app.route("/")
 def index():
-    return "Backend de Acordes -> PDF + MIDI. La interfaz está en GitHub Pages."
+    return "Chords -> PDF + MIDI backend. The interface is on GitHub Pages."
 
 
 @app.route("/convert", methods=["POST", "OPTIONS"])
@@ -1579,7 +1579,7 @@ def convert():
         if upload and upload.filename:
             ext = os.path.splitext(upload.filename)[1].lower()
             if ext not in ALLOWED_EXT:
-                return jsonify(error="Archivo no soportado. Usa .musicxml, .xml o .txt."), 400
+                return jsonify(error="Unsupported file. Use .musicxml, .xml or .txt."), 400
             base = safe_filename(os.path.splitext(upload.filename)[0]) or "cancion"
             src = os.path.join(tmp, base + ext)
             upload.save(src)
@@ -1591,7 +1591,7 @@ def convert():
             with open(src, "w", encoding="utf-8") as fh:
                 fh.write(url)
         else:
-            return jsonify(error="Pega un enlace, sube un archivo .musicxml/.txt o pega el texto del .txt."), 400
+            return jsonify(error="Paste a link, upload a .musicxml/.txt file, or paste the .txt text."), 400
 
         dest = os.path.join(tmp, "out")
         os.makedirs(dest, exist_ok=True)
@@ -1608,7 +1608,7 @@ def convert():
             files = sorted(os.path.join(dest, f) for f in os.listdir(dest)
                            if os.path.isfile(os.path.join(dest, f)))
             if not files:
-                return jsonify(error="No se genero ningun archivo."), 500
+                return jsonify(error="No file was generated."), 500
             if len(files) == 1:
                 p = files[0]
                 with open(p, "rb") as fh:

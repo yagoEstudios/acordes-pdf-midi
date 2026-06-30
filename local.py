@@ -1106,7 +1106,7 @@ def parse_song_txt(path, transpose=""):
             span[-1]["times"] = b["repeat"]
         measures.extend(span)
     if not measures:
-        raise ValueError("El archivo no contiene acordes.")
+        raise ValueError("The file contains no chords.")
     if measures[0]["left"] == "|":
         measures[0]["left"] = "["
     if not any(m.get("end") for m in measures) and measures[-1]["right"] == "|":
@@ -1133,7 +1133,7 @@ def _out_name(tune, midi=False):
     name = safe_filename(tune.title or "cancion")
     key = getattr(tune, "key", "").replace("-", "m")
     if getattr(tune, "degrees", False):
-        name += f" ({key})" if (midi and key) else " (grados)"
+        name += f" ({key})" if (midi and key) else " (deg)"
     elif getattr(tune, "transposed", False):
         name += f" ({key})"
     return name
@@ -1166,7 +1166,7 @@ def note_to_midi(note_str):
         octave, s = int(s[-1]), s[:-1]
     semitone = LETTER_SEMITONE.get(s[0])
     if semitone is None:
-        raise ValueError(f"Nota no reconocida: {note_str!r}")
+        raise ValueError(f"Unrecognized note: {note_str!r}")
     for ch in s[1:]:
         semitone += 1 if ch == '#' else -1 if ch == 'b' else 0
     return semitone + (octave * 12) + 12
@@ -1258,7 +1258,7 @@ def convert_txt_to_midi(path, output_folder, volume=100, program=0,
                     midi.addNote(0, 0, note, time, duration, volume)
                 prev_name = name
             except Exception as e:
-                warnings.append(f"Acorde ignorado {name!r}: {e}")
+                warnings.append(f"Chord skipped {name!r}: {e}")
         time += duration
 
     os.makedirs(output_folder, exist_ok=True)
@@ -1427,7 +1427,7 @@ def load_tunes(src):
         return "musicxml", [parse_musicxml(src)]
     if ext == ".txt":
         return "txt", [parse_song_txt(src)]
-    raise ValueError(f"Fuente no reconocida: {src!r}")
+    raise ValueError(f"Unrecognized source: {src!r}")
 
 
 def process_source(src, dest_root, transpose="", bpm="", output="full"):
@@ -1437,7 +1437,7 @@ def process_source(src, dest_root, transpose="", bpm="", output="full"):
     Devuelve (carpetas, avisos)."""
     kind, tunes = load_tunes(src)
     if not tunes:
-        raise ValueError("No se ha leído ninguna canción de la fuente.")
+        raise ValueError("No song could be read from the source.")
     folders, warnings = [], []
     for tune in tunes:
         name = safe_filename(tune.title or "cancion")
@@ -1445,12 +1445,12 @@ def process_source(src, dest_root, transpose="", bpm="", output="full"):
         if bpm:
             tune.bpm = bpm   # override del tempo (afecta a ireal/musicxml via tune_to_txt)
         if transpose and not getattr(tune, "key", ""):
-            warnings.append(f"'{tune.title}': no se pudo transponer (la canción no tiene tonalidad).")
+            warnings.append(f"'{tune.title}': could not transpose (the song has no key).")
 
         if output == "full":
             folder = os.path.join(dest_root, name)
             if os.path.exists(folder):
-                raise FileExistsError(f"La carpeta ya existe: {folder}")
+                raise FileExistsError(f"The folder already exists: {folder}")
             os.makedirs(folder)
 
             # 1) .txt canónico (con trans=/bpm= si se pidieron)
@@ -1524,7 +1524,7 @@ def clear_url():
 
 def select_source():
     path = filedialog.askopenfilename(
-        filetypes=[("Fuentes", "*.musicxml *.xml *.txt"), ("Todos", "*.*")])
+        filetypes=[("Sources", "*.musicxml *.xml *.txt"), ("All", "*.*")])
     if path:
         entry_url.delete(0, ctk.END)
         entry_url.insert(0, path)
@@ -1535,24 +1535,24 @@ def convert():
     folder = entry_folder.get().strip() or DEFAULT_OUTPUT
 
     if not src:
-        messagebox.showwarning("Campo vacío",
-                               "Pega un enlace Real o elige un archivo .musicxml/.txt.")
+        messagebox.showwarning("Empty field",
+                               "Paste a Real link or choose a .musicxml/.txt file.")
         return
     is_url = src.startswith("irealb://") or src.startswith("irealbook://")
     if not is_url and not os.path.isfile(src):
-        messagebox.showwarning("Fuente no válida",
-                               "Debe ser un enlace irealb:// / irealbook:// o un "
-                               "archivo .musicxml/.xml/.txt existente.")
+        messagebox.showwarning("Invalid source",
+                               "Must be an irealb:// / irealbook:// link or an "
+                               "existing .musicxml/.xml/.txt file.")
         return
 
     transpose = entry_transpose.get().strip()
     bpm = entry_bpm.get().strip()
-    out_opts = {"Completo": "full", "Solo PDF": "pdf", "Solo MIDI": "midi"}
+    out_opts = {"Full": "full", "PDF only": "pdf", "MIDI only": "midi"}
     output = out_opts.get(seg_output.get(), "full")
 
     btn_convert.configure(state="disabled")
-    status_label.configure(text="Convirtiendo...")
-    gen_label = "Generando txt, PDF y MIDI..." if output == "full" else f"Generando {seg_output.get()}..."
+    status_label.configure(text="Converting...")
+    gen_label = "Generating txt, PDF and MIDI..." if output == "full" else f"Generating {seg_output.get()}..."
     detail_label.configure(text=gen_label)
 
     def task():
@@ -1567,15 +1567,15 @@ def convert():
 
 
 def done_ok(folders, warnings=()):
-    status_label.configure(text="¡Listo!")
-    detail = f"{len(folders)} canción(es).\n{folders[0]}"
+    status_label.configure(text="Done!")
+    detail = f"{len(folders)} song(s).\n{folders[0]}"
     if warnings:
         detail += "\n⚠ " + "\n⚠ ".join(warnings)
     detail_label.configure(text=detail)
     btn_convert.configure(state="normal")
     if warnings:
-        messagebox.showwarning("Aviso", "\n".join(warnings))
-    if messagebox.askyesno("Hecho", f"Creado en:\n{folders[0]}\n\n¿Abrir la carpeta?"):
+        messagebox.showwarning("Warning", "\n".join(warnings))
+    if messagebox.askyesno("Done", f"Created in:\n{folders[0]}\n\nOpen the folder?"):
         os.startfile(folders[0])
 
 
@@ -1583,20 +1583,20 @@ def done_err(msg):
     status_label.configure(text="Error")
     detail_label.configure(text="")
     btn_convert.configure(state="normal")
-    messagebox.showerror("Error", f"No se pudo convertir:\n\n{msg}")
+    messagebox.showerror("Error", f"Could not convert:\n\n{msg}")
 
 
 def main():
     global root, entry_url, entry_folder, entry_transpose, entry_bpm, seg_output, btn_convert, status_label, detail_label
 
     root = ctk.CTk()
-    root.title("Acordes → PDF + MIDI")
+    root.title("Chords → PDF + MIDI")
     root.geometry("760x740")
     root.minsize(720, 700)
     root.configure(fg_color=COLOR_BG)
 
     ctk.CTkLabel(
-        root, text="🎼 Acordes  →  PDF + MIDI",
+        root, text="🎼 Chords  →  PDF + MIDI",
         font=ctk.CTkFont(size=24, weight="bold"), text_color=COLOR_PRIMARY,
     ).pack(pady=(24, 4))
     ctk.CTkLabel(
@@ -1607,73 +1607,73 @@ def main():
     card = ctk.CTkFrame(root, fg_color=COLOR_SURFACE, corner_radius=12)
     card.pack(fill="x", padx=24, pady=8)
 
-    ctk.CTkLabel(card, text="Enlace Real o archivo (.musicxml / .txt)",
+    ctk.CTkLabel(card, text="Real link or file (.musicxml / .txt)",
                  text_color=COLOR_TEXT, anchor="w").pack(fill="x", padx=16, pady=(16, 4))
     frame_url = ctk.CTkFrame(card, fg_color="transparent")
     frame_url.pack(fill="x", padx=16, pady=(0, 12))
 
-    entry_url = ctk.CTkEntry(frame_url, placeholder_text="irealb://, o ruta a .musicxml / .txt",
+    entry_url = ctk.CTkEntry(frame_url, placeholder_text="irealb://, or path to .musicxml / .txt",
                              height=38, fg_color=COLOR_BG, border_color=COLOR_PRIMARY_VARIANT,
                              border_width=2, text_color=COLOR_TEXT,
                              placeholder_text_color=COLOR_PLACEHOLDER)
     entry_url.pack(side="left", fill="x", expand=True)
 
-    btn_file = ctk.CTkButton(frame_url, text="📄 Archivo", command=select_source, width=110, height=38,
+    btn_file = ctk.CTkButton(frame_url, text="📄 File", command=select_source, width=110, height=38,
                              fg_color="transparent", border_color=COLOR_SECONDARY, border_width=2,
                              text_color=COLOR_SECONDARY, hover_color=COLOR_SURFACE)
     btn_file.pack(side="left", padx=(8, 0))
 
-    btn_clear = ctk.CTkButton(frame_url, text="Limpiar", command=clear_url, width=90, height=38,
+    btn_clear = ctk.CTkButton(frame_url, text="Clear", command=clear_url, width=90, height=38,
                               fg_color="transparent", border_color=COLOR_SECONDARY, border_width=2,
                               text_color=COLOR_SECONDARY, hover_color=COLOR_SURFACE)
     btn_clear.pack(side="left", padx=(8, 0))
 
-    ctk.CTkLabel(card, text="Carpeta de salida (se crea una subcarpeta por canción)",
+    ctk.CTkLabel(card, text="Output folder (a subfolder is created per song)",
                  text_color=COLOR_TEXT, anchor="w").pack(fill="x", padx=16, pady=(4, 4))
     frame_folder = ctk.CTkFrame(card, fg_color="transparent")
     frame_folder.pack(fill="x", padx=16, pady=(0, 16))
 
-    entry_folder = ctk.CTkEntry(frame_folder, placeholder_text="Selecciona una carpeta...", height=38,
+    entry_folder = ctk.CTkEntry(frame_folder, placeholder_text="Select a folder...", height=38,
                                 fg_color=COLOR_BG, border_color=COLOR_PRIMARY_VARIANT, border_width=2,
                                 text_color=COLOR_TEXT, placeholder_text_color=COLOR_PLACEHOLDER)
     entry_folder.pack(side="left", fill="x", expand=True)
     entry_folder.insert(0, DEFAULT_OUTPUT)
 
-    btn_select = ctk.CTkButton(frame_folder, text="📁 Elegir…", command=select_folder, width=130, height=38,
+    btn_select = ctk.CTkButton(frame_folder, text="📁 Choose…", command=select_folder, width=130, height=38,
                                fg_color="transparent", border_color=COLOR_SECONDARY, border_width=2,
                                text_color=COLOR_SECONDARY, hover_color=COLOR_SURFACE)
     btn_select.pack(side="left", padx=(8, 0))
 
-    ctk.CTkLabel(card, text="Transponer a (opcional: Gm, Abmin, C#, F… ; +3 semitonos; o 'grados')",
+    ctk.CTkLabel(card, text="Transpose to (optional: Gm, Abmin, C#, F… ; +3 semitones; or 'deg')",
                  text_color=COLOR_TEXT, anchor="w").pack(fill="x", padx=16, pady=(4, 4))
-    entry_transpose = ctk.CTkEntry(card, placeholder_text="vacío = sin transponer", height=38,
+    entry_transpose = ctk.CTkEntry(card, placeholder_text="empty = no transpose", height=38,
                                    fg_color=COLOR_BG, border_color=COLOR_PRIMARY_VARIANT, border_width=2,
                                    text_color=COLOR_TEXT, placeholder_text_color=COLOR_PLACEHOLDER)
     entry_transpose.pack(fill="x", padx=16, pady=(0, 12))
 
-    ctk.CTkLabel(card, text="BPM (opcional: sobrescribe el tempo de la fuente)",
+    ctk.CTkLabel(card, text="BPM (optional: overrides the source tempo)",
                  text_color=COLOR_TEXT, anchor="w").pack(fill="x", padx=16, pady=(4, 4))
-    entry_bpm = ctk.CTkEntry(card, placeholder_text="vacío = el de la fuente", height=38,
+    entry_bpm = ctk.CTkEntry(card, placeholder_text="empty = source's", height=38,
                              fg_color=COLOR_BG, border_color=COLOR_PRIMARY_VARIANT, border_width=2,
                              text_color=COLOR_TEXT, placeholder_text_color=COLOR_PLACEHOLDER)
     entry_bpm.pack(fill="x", padx=16, pady=(0, 12))
 
-    ctk.CTkLabel(card, text="Salida (opcional)",
+    ctk.CTkLabel(card, text="Output (optional)",
                  text_color=COLOR_TEXT, anchor="w").pack(fill="x", padx=16, pady=(4, 4))
-    seg_output = ctk.CTkSegmentedButton(card, values=["Completo", "Solo PDF", "Solo MIDI"],
+    seg_output = ctk.CTkSegmentedButton(card, values=["Full", "PDF only", "MIDI only"],
                                         fg_color=COLOR_BG, selected_color=COLOR_PRIMARY,
                                         selected_hover_color=COLOR_PRIMARY_VARIANT,
                                         unselected_color=COLOR_BG, text_color=COLOR_TEXT,
                                         unselected_hover_color=COLOR_SURFACE)
-    seg_output.set("Completo")
+    seg_output.set("Full")
     seg_output.pack(fill="x", padx=16, pady=(0, 16))
 
-    btn_convert = ctk.CTkButton(root, text="🎼 Convertir (PDF + MIDI)", command=convert, height=46,
+    btn_convert = ctk.CTkButton(root, text="🎼 Convert (PDF + MIDI)", command=convert, height=46,
                                 font=ctk.CTkFont(size=15, weight="bold"), fg_color=COLOR_PRIMARY,
                                 hover_color=COLOR_PRIMARY_VARIANT, text_color=COLOR_BG)
     btn_convert.pack(fill="x", padx=24, pady=(8, 4))
 
-    status_label = ctk.CTkLabel(root, text="Listo para convertir",
+    status_label = ctk.CTkLabel(root, text="Ready to convert",
                                 font=ctk.CTkFont(size=14, weight="bold"), text_color=COLOR_SECONDARY)
     status_label.pack(pady=(16, 4))
 
@@ -1684,7 +1684,7 @@ def main():
     try:
         root.mainloop()
     except KeyboardInterrupt:
-        print("\nCerrado.")
+        print("\nClosed.")
         try:
             root.destroy()
         except Exception:
@@ -1698,7 +1698,7 @@ if __name__ == "__main__":
         bpm = sys.argv[3] if len(sys.argv) > 3 else ""
         folders, warnings = process_source(sys.argv[1].strip('"'), DEFAULT_OUTPUT, transpose, bpm)
         for fo in folders:
-            print("Carpeta:", fo)
+            print("Folder:", fo)
         for w in warnings:
             print("  ⚠", w)
         os.startfile(folders[0])

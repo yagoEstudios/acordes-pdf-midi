@@ -1,61 +1,61 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acordes → PDF + MIDI</title>
+  <title>Chords → PDF + MIDI</title>
   <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <main class="card">
-    <h1>🎼 Acordes → PDF + MIDI</h1>
+    <h1>🎼 Chords → PDF + MIDI</h1>
     <p class="subtitle">MusicXML · TXT</p>
 
     <form id="form">
-      <label>Enlace, archivo (.musicxml / .txt) o el texto del .txt</label>
-      <textarea id="url" name="url" rows="1" placeholder="Pega un enlace Real… o el contenido de un .txt"></textarea>
-      <button type="button" class="secondary" id="clear">Limpiar</button>
+      <label>Link, file (.musicxml / .txt) or the .txt text</label>
+      <textarea id="url" name="url" rows="1" placeholder="Paste a Real link… or the contents of a .txt"></textarea>
+      <button type="button" class="secondary" id="clear">Clear</button>
 
       <div class="file-row">
-        <label for="file" class="secondary">Elegir archivo</label>
-        <span id="fileName" class="file-name">no hay archivo</span>
-        <button type="button" class="secondary" id="clearFile">Quitar</button>
+        <label for="file" class="secondary">Choose file</label>
+        <span id="fileName" class="file-name">no file</span>
+        <button type="button" class="secondary" id="clearFile">Remove</button>
         <input type="file" id="file" name="file" accept=".musicxml,.xml,.txt" hidden>
       </div>
 
       <div class="grid">
         <div>
-          <label>Transponer a <span class="opt">(opcional)</span></label>
-          <input type="text" name="transpose" placeholder="Gm, Db, +3, grados…">
+          <label>Transpose to <span class="opt">(optional)</span></label>
+          <input type="text" name="transpose" placeholder="Gm, Db, +3, deg…">
         </div>
         <div>
-          <label>BPM <span class="opt">(opcional)</span></label>
+          <label>BPM <span class="opt">(optional)</span></label>
           <input type="text" name="bpm" placeholder="120">
         </div>
       </div>
 
-      <label>Salida</label>
+      <label>Output</label>
       <div class="seg" id="seg">
-        <button type="button" class="active" data-val="full">Completo (zip)</button>
-        <button type="button" data-val="pdf">Solo PDF</button>
-        <button type="button" data-val="midi">Solo MIDI</button>
+        <button type="button" class="active" data-val="full">Full (zip)</button>
+        <button type="button" data-val="pdf">PDF only</button>
+        <button type="button" data-val="midi">MIDI only</button>
       </div>
       <input type="hidden" name="output" id="output" value="full">
 
-      <button type="submit" class="primary" id="submit">Generar</button>
+      <button type="submit" class="primary" id="submit">Generate</button>
     </form>
 
     <p class="status" id="status"></p>
   </main>
 
   <footer class="links-footer">
-    <a href="https://github.com/yagoEstudios/acordes-pdf-midi" target="_blank" rel="noopener">Repositorio</a>
+    <a href="https://github.com/yagoEstudios/acordes-pdf-midi" target="_blank" rel="noopener">Repository</a>
     <span>·</span>
     <a href="https://github.com/yagoEstudios/acordes-pdf-midi/blob/main/README.md" target="_blank" rel="noopener">README</a>
   </footer>
 
   <script>
-    // ⚠️ CAMBIA esto por tu URL de PythonAnywhere (sin barra final):
+    // ⚠️ CHANGE this to your PythonAnywhere URL (no trailing slash):
     const BACKEND_URL = "https://yagoestudios.pythonanywhere.com";
 
     const urlField = document.getElementById('url');
@@ -67,11 +67,11 @@
     const fileField = document.getElementById('file');
     const fileName = document.getElementById('fileName');
     fileField.addEventListener('change', () => {
-      fileName.textContent = fileField.files.length ? fileField.files[0].name : 'no hay archivo';
+      fileName.textContent = fileField.files.length ? fileField.files[0].name : 'no file';
     });
     document.getElementById('clearFile').addEventListener('click', () => {
       fileField.value = '';
-      fileName.textContent = 'no hay archivo';
+      fileName.textContent = 'no file';
     });
 
     const seg = document.getElementById('seg');
@@ -96,7 +96,7 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       status.className = 'status';
-      status.textContent = 'Generando…';
+      status.textContent = 'Generating…';
       submit.disabled = true;
       try {
         const resp = await fetch(BACKEND_URL + '/convert', { method: 'POST', body: new FormData(form) });
@@ -108,7 +108,7 @@
           return;
         }
         const blob = await resp.blob();
-        const name = filenameFromCD(resp.headers.get('Content-Disposition')) || 'descarga';
+        const name = filenameFromCD(resp.headers.get('Content-Disposition')) || 'download';
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = name;
