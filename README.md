@@ -155,6 +155,10 @@ G7 F7 C7 G7
 
 ### Con varios acordes por compás (`_`) y compás 3/4
 
+En 3/4 el compás tiene 3 beats, así que para que el reparto salga limpio divide
+con `_` en **tres** acordes (1 beat cada uno). Dividir en dos daría 1,5 beats por
+acorde.
+
 ```
 tune="Vals"
 artist="Juan"
@@ -162,8 +166,8 @@ bpm=90
 key="G"
 sig="3/4"
 
-G Em Am_D7
-G Em A7_D7
+G Em C
+A7 D7 G_Em_A7
 ```
 
 ### Con secciones
