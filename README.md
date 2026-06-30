@@ -58,11 +58,11 @@ One line per variable, `key=value`, at the top of the file. All optional. **Valu
 | Key | Default | What it does |
 |-------|-------------|----------|
 | `tune` | `cancion` | title; names the folder and files |
-| `artist` | (empty) | composer (top right) |
+| `artist` | (optional) | composer (top right) |
 | `bpm` | `120` | MIDI tempo (no quotes) |
-| `key` | (empty) | key (`Eb`, `Gm`, `F#m`…); required to transpose |
+| `key` | (optional) | key (`Eb`, `Gm`, `F#m`…); required to transpose |
 | `sig` | `4/4` | time signature; distributes the beats in the MIDI |
-| `trans` | (empty) | transpose (see below) |
+| `trans` | (optional) | transpose (see below) |
 
 ## Chords
 
