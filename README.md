@@ -13,8 +13,8 @@ Este `.txt`:
 ```
 tune="Fujita"
 artist="Lewis"
-key=C
-sig=4/4
+key="C"
+sig="4/4"
 bpm=200
 
 = x2
